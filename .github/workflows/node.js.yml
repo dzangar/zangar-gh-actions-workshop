@@ -24,7 +24,7 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4  # Checkout the code from the repository
-    - name: Use Node.js ${{ matrix.node-version }}  # Use the Node.js version from the matrix
+    - name: Use Node.js 16.x  # Use the Node.js version from the matrix
       uses: actions/setup-node@v4  # Action to set up Node.js
       with:
         node-version: ${{ matrix.node-version }}  # Use the current Node.js version from the matrix
