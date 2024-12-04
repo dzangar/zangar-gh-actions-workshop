@@ -1,31 +1,39 @@
-# This workflow will do a clean installation of node dependencies, cache/restore them, build the source code and run tests across different versions of node
+# This workflow will do a clean installation of node dependencies, cache/restore them, build the source code, and run tests across different versions of node
 # For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-nodejs
 
 name: Node.js CI
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "main" ]  # Trigger on push to the main branch
   pull_request:
-    branches: [ "main" ]
+    branches: [ "main" ]  # Trigger on pull request targeting the main branch
 
 jobs:
   build:
+    name: "Build and Test"  # Better name for the job
+    runs-on: ubuntu-latest  # The job will run on the latest version of Ubuntu
 
-    runs-on: ubuntu-latest
+    permissions:
+      contents: read  # Required to allow actions/checkout to clone the repository onto the runner
+      pull-requests: write  # Required to allow vitest coverage action to write a comment into the pull request
 
     strategy:
       matrix:
-        node-version: [18.x, 20.x, 22.x]
-        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
+        node-version: [18.x, 20.x, 22.x]  # Test across multiple Node.js versions
 
     steps:
-    - uses: actions/checkout@v4
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v4
+    - uses: actions/checkout@v4  # Checkout the code from the repository
+    - name: Use Node.js ${{ matrix.node-version }}  # Use the Node.js version from the matrix
+      uses: actions/setup-node@v4  # Action to set up Node.js
       with:
-        node-version: ${{ matrix.node-version }}
-        cache: 'npm'
-    - run: npm ci
-    - run: npm run build --if-present
-    - run: npm test
+        node-version: ${{ matrix.node-version }}  # Use the current Node.js version from the matrix
+        cache: 'npm'  # Cache npm dependencies to speed up builds
+    - run: npm ci  # Clean install of dependencies using npm ci (faster for CI)
+    - run: npm run build --if-present  # Run the build script if it exists
+    - run: npm test  # Run the tests (make sure tests are defined in your package.json)
+    
+    # Add the vitest coverage report step after running tests
+    - uses: davelosert/vitest-coverage-report-action@v1  # Action to report coverage
+      with:
+        vite-config-path: vite.config.ts  # Path to your Vite config (if needed)
