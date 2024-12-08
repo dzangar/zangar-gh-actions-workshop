@@ -24,7 +24,7 @@ jobs:
           ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ec2-user@${{ secrets.EC2_IP }} << 'EOF'
             echo 'hello world'
             # Navigate to your project directory on EC2
-            cd /home/ec2-user/my-app
+            cd /home/ec2-user/my-app/zangar-gh-actions-workshop
 
             # Build the Docker image on the EC2 instance
             sudo docker build -t my-app .
