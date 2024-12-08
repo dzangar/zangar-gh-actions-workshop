@@ -1,0 +1,39 @@
+name: Deploy to EC2 via SSH and Docker
+
+on:
+  push:
+    branches:
+      - main  # Trigger deploy on push to the main branch
+  workflow_dispatch: # Optional: to manually trigger the workflow
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up SSH key
+        uses: webfactory/ssh-agent@v0.5.3
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Deploy to EC2 via SSH
+        run: |
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ec2-user@${{ secrets.EC2_IP }} << 'EOF'
+            echo 'hello world'
+            # Navigate to your project directory on EC2
+            cd /home/ec2-user/my-app
+
+            # Build the Docker image on the EC2 instance
+            sudo docker build -t my-app .
+
+            # Stop and remove any existing containers
+            sudo docker-compose down
+
+            # Start the new containers with the updated image
+            sudo docker-compose up -d --build
+          EOF
+        env:
+          EC2_IP: ${{ secrets.EC2_IP }}
