@@ -1,19 +1,11 @@
-version: '3.8'
+version: '3'
 
 services:
   app:
-    image: my-app:latest  # Имя образа, которое вы строите с помощью docker build
-    container_name: my-app-container
-    restart: always
+    image: my-app  # This image will be built locally on EC2 during the workflow
     ports:
-      - "80:3000"  # Прокси-сервер на порту 80 будет направлять трафик на порт 3000 в контейнере
+      - "80:80"
     environment:
-      NODE_ENV: production
+      - APP_ENV=production
     volumes:
-      - .:/usr/src/app  # Монтируем текущую директорию на контейнер
-    networks:
-      - my-network
-
-networks:
-  my-network:
-    driver: bridge
+      - ./app:/app  # Update this based on your app's folder structure
